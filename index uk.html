@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MapPresence — Local · Web · Social</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#4CAF50;--green-light:#6DC96F;--green-dark:#388E3C;
+  --green-bg:#F0FAF0;--charcoal:#2D2D2D;--charcoal-mid:#4A4A4A;
+  --gray:#7A7A7A;--gray-light:#E8E8E8;--white:#FFFFFF;
+  --shadow:0 4px 24px rgba(76,175,80,0.12);
+  --shadow-lg:0 12px 48px rgba(0,0,0,0.10);--radius:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;color:var(--charcoal);background:var(--white);line-height:1.65;overflow-x:hidden;}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#f1f1f1}
+::-webkit-scrollbar-thumb{background:var(--green);border-radius:3px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(76,175,80,0.15);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:72px;transition:box-shadow .3s;}
+nav.scrolled{box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.nav-logo{font-size:1.5rem;font-weight:800;color:var(--green);}
+.nav-logo span{color:var(--charcoal);}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-links a{text-decoration:none;color:var(--charcoal-mid);font-size:.88rem;font-weight:600;padding:8px 16px;border-radius:50px;transition:all .25s;}
+.nav-links a:hover,.nav-links a.active{color:var(--green-dark);background:var(--green-bg)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:24px;height:2px;background:var(--charcoal);border-radius:2px;transition:all .3s}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 5% 60px;background:linear-gradient(135deg,#ffffff 0%,#f0faf0 55%,#e8f5e9 100%);position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(76,175,80,0.1) 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.hero-brand{display:flex;align-items:center;gap:14px;margin-bottom:24px;animation:fadeUp .5s ease both;}
+.hero-brand .logo{font-size:2.2rem;background:var(--green-bg);width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;}
+.hero-brand-name{font-size:1.6rem;font-weight:800;color:var(--charcoal);line-height:1.1}
+.hero-brand-name span{color:var(--green)}
+.hero-brand-sub{font-size:.68rem;color:var(--gray);letter-spacing:2.5px;font-weight:600;text-transform:uppercase}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green-bg);border:1px solid rgba(76,175,80,0.3);color:var(--green-dark);font-size:.78rem;font-weight:700;padding:6px 16px;border-radius:50px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:22px;animation:fadeUp .6s .1s ease both;}
+h1{font-size:clamp(2rem,4.5vw,3.4rem);font-weight:800;line-height:1.15;color:var(--charcoal);margin-bottom:18px;animation:fadeUp .6s .18s ease both;}
+h1 span{color:var(--green)}
+.hero-sub{font-size:1rem;color:var(--charcoal-mid);font-weight:300;margin-bottom:34px;line-height:1.72;animation:fadeUp .6s .26s ease both;}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;animation:fadeUp .6s .34s ease both}
+.btn-primary{background:var(--green);color:var(--white);text-decoration:none;font-weight:700;font-size:.95rem;padding:15px 32px;border-radius:50px;box-shadow:0 6px 20px rgba(76,175,80,0.35);transition:all .25s;display:inline-block;}
+.btn-primary:hover{background:var(--green-dark);transform:translateY(-2px);box-shadow:0 10px 28px rgba(76,175,80,0.4)}
+.btn-outline{background:transparent;color:var(--green-dark);text-decoration:none;font-weight:700;font-size:.95rem;padding:15px 32px;border-radius:50px;border:2px solid var(--green);transition:all .25s;display:inline-block;}
+.btn-outline:hover{background:var(--green-bg);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:32px;margin-top:40px;animation:fadeUp .6s .42s ease both;}
+.stat{text-align:center}
+.stat-num{font-size:1.8rem;font-weight:800;color:var(--green-dark)}
+.stat-label{font-size:.75rem;color:var(--gray);font-weight:500;letter-spacing:.5px}
+.hero-visual{display:flex;justify-content:center;align-items:center;animation:fadeUp .8s .2s ease both;}
+.hero-img-card{border-radius:24px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.15);position:relative;width:100%;background:linear-gradient(135deg,#1a4d2e,#2d7a47);height:420px;display:flex;align-items:center;justify-content:center;color:white;font-size:3rem;}
+.hero-img-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(13,40,24,0.85));padding:28px 24px;}
+.hero-img-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:white;font-size:.78rem;font-weight:700;padding:6px 14px;border-radius:50px;margin-bottom:8px;}
+.hero-img-text{color:white;font-size:.95rem;font-weight:600;}
+
+/* SECTIONS */
+section{padding:90px 5%}
+.section-inner{max-width:1200px;margin:0 auto;width:100%}
+.section-tag{display:inline-block;background:var(--green-bg);color:var(--green-dark);font-size:.72rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:5px 14px;border-radius:50px;margin-bottom:14px;}
+h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:var(--charcoal);margin-bottom:14px;line-height:1.2}
+h2 span{color:var(--green)}
+.section-sub{font-size:1rem;color:var(--gray);max-width:560px;line-height:1.7;margin-bottom:50px}
+
+/* SERVICES */
+#services{background:var(--white)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.service-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-light);padding:32px 28px;transition:all .3s;position:relative;overflow:hidden;}
+.service-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--green-light));transform:scaleX(0);transition:transform .3s;}
+.service-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:rgba(76,175,80,0.3)}
+.service-card:hover::after{transform:scaleX(1)}
+.service-icon{width:56px;height:56px;border-radius:14px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:20px;}
+.service-card h3{font-size:1.1rem;font-weight:700;color:var(--charcoal);margin-bottom:10px}
+.service-card p{font-size:.88rem;color:var(--gray);line-height:1.65}
+.service-tag{display:inline-block;margin-top:14px;font-size:.72rem;font-weight:700;color:var(--green-dark);background:var(--green-bg);padding:3px 10px;border-radius:50px;}
+
+/* FREE AUDIT SECTION */
+#audit{background:linear-gradient(135deg,#0d2818 0%,#1a4d2e 100%);color:white;}
+.audit-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.audit-text .section-tag{background:rgba(255,255,255,0.15);color:#a8e6ab}
+.audit-text h2{color:white}
+.audit-text h2 span{color:var(--green-light)}
+.audit-text p{color:rgba(255,255,255,0.75);font-size:.95rem;line-height:1.75;margin-bottom:24px;}
+.audit-features{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+.audit-feature{display:flex;align-items:center;gap:12px;font-size:.9rem;color:rgba(255,255,255,0.85);}
+.audit-feature-icon{width:32px;height:32px;border-radius:8px;background:rgba(76,175,80,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.btn-audit{display:inline-block;background:var(--green);color:white;text-decoration:none;font-weight:700;font-size:.95rem;padding:16px 36px;border-radius:50px;box-shadow:0 8px 24px rgba(76,175,80,0.4);transition:all .25s;}
+.btn-audit:hover{background:var(--green-light);transform:translateY(-2px)}
+.audit-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:32px;backdrop-filter:blur(10px);}
+.audit-card-title{font-size:.75rem;font-weight:700;color:var(--green-light);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;}
+.audit-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.08);}
+.audit-item:last-child{border-bottom:none}
+.audit-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.audit-dot.red{background:#FF5252;}
+.audit-dot.orange{background:#FF9800;}
+.audit-dot.green{background:var(--green);}
+.audit-item-text{font-size:.85rem;color:rgba(255,255,255,0.8);}
+.audit-item-status{margin-left:auto;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:50px;}
+.status-bad{background:rgba(255,82,82,0.2);color:#FF5252;}
+.status-warn{background:rgba(255,152,0,0.2);color:#FF9800;}
+.status-ok{background:rgba(76,175,80,0.2);color:var(--green-light);}
+.audit-free-badge{display:inline-block;margin-top:20px;background:var(--green);color:white;font-size:.8rem;font-weight:800;padding:8px 18px;border-radius:50px;letter-spacing:.5px;}
+
+/* PRICING */
+#pricing{background:linear-gradient(180deg,#f9fffe 0%,#f0faf0 100%)}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+.pricing-card{background:var(--white);border-radius:20px;border:2px solid var(--gray-light);padding:36px 28px;position:relative;transition:all .3s;}
+.pricing-card.featured{border-color:var(--green);box-shadow:0 16px 56px rgba(76,175,80,0.18);}
+.pricing-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--white);font-size:.72rem;font-weight:700;letter-spacing:1px;padding:5px 18px;border-radius:50px;white-space:nowrap;text-transform:uppercase;}
+.pricing-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.pricing-card.featured:hover{box-shadow:0 20px 60px rgba(76,175,80,0.25)}
+.price-label{font-size:.75rem;font-weight:600;color:var(--gray);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.price-emoji{font-size:1.5rem;margin-bottom:8px}
+.price-amount{font-size:2.6rem;font-weight:800;color:var(--charcoal);line-height:1}
+.price-amount sup{font-size:1.1rem;font-weight:700;vertical-align:super}
+.price-period{font-size:.82rem;color:var(--gray);font-weight:400;margin-left:3px}
+.price-desc{font-size:.85rem;color:var(--charcoal-mid);margin:12px 0 20px;line-height:1.6;padding-bottom:20px;border-bottom:1px solid var(--gray-light)}
+.price-features{list-style:none;margin-bottom:28px}
+.price-features li{font-size:.85rem;color:var(--charcoal-mid);padding:6px 0;display:flex;align-items:flex-start;gap:10px;}
+.check{color:var(--green);font-weight:800;flex-shrink:0;margin-top:1px}
+.pricing-cta{display:block;text-align:center;text-decoration:none;font-weight:700;font-size:.9rem;padding:13px;border-radius:50px;transition:all .25s;}
+.pricing-card.featured .pricing-cta{background:var(--green);color:var(--white);box-shadow:0 6px 20px rgba(76,175,80,0.3);}
+.pricing-card.featured .pricing-cta:hover{background:var(--green-dark)}
+.pricing-card:not(.featured) .pricing-cta{border:2px solid var(--green);color:var(--green-dark);}
+.pricing-card:not(.featured) .pricing-cta:hover{background:var(--green-bg)}
+
+/* ABOUT */
+#about{background:var(--white)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;}
+.about-img-wrap{position:relative}
+.about-img-box{border-radius:24px;overflow:hidden;height:420px;position:relative;background:linear-gradient(135deg,#1a4d2e,#2d7a47);display:flex;align-items:center;justify-content:center;color:white;font-size:4rem;}
+.about-float{position:absolute;bottom:-18px;right:-18px;background:var(--white);border-radius:16px;box-shadow:var(--shadow-lg);padding:18px 22px;border:1px solid rgba(76,175,80,0.2);}
+.about-float-num{font-size:1.6rem;font-weight:800;color:var(--green-dark)}
+.about-float-lbl{font-size:.72rem;color:var(--gray);font-weight:600}
+.about-text p{font-size:.95rem;color:var(--gray);line-height:1.75;margin-bottom:16px;}
+.about-pillars{display:flex;flex-direction:column;gap:14px;margin-top:28px}
+.pillar{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;border-radius:12px;background:var(--green-bg);border:1px solid rgba(76,175,80,0.15);}
+.pillar-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.pillar h4{font-size:.9rem;font-weight:700;color:var(--charcoal);margin-bottom:2px}
+.pillar p{font-size:.8rem;color:var(--gray)}
+
+/* CONTACT */
+#contact{background:linear-gradient(180deg,#f0faf0,#ffffff)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:start;}
+.contact-info p{font-size:.95rem;color:var(--gray);line-height:1.75;margin-bottom:30px;}
+.contact-item{display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:14px 18px;background:var(--white);border-radius:12px;border:1px solid var(--gray-light);font-size:.88rem;color:var(--charcoal-mid);}
+.contact-item-icon{width:38px;height:38px;border-radius:10px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.contact-item a{color:var(--charcoal-mid);text-decoration:none;transition:color .2s;}
+.contact-item a:hover{color:var(--green-dark)}
+.contact-form{background:var(--white);border-radius:20px;padding:36px;box-shadow:var(--shadow-lg);border:1px solid rgba(76,175,80,0.12);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.8rem;font-weight:700;color:var(--charcoal-mid);margin-bottom:6px;letter-spacing:.3px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 16px;border:1.5px solid var(--gray-light);border-radius:10px;font-family:inherit;font-size:.9rem;color:var(--charcoal);background:var(--white);outline:none;transition:border-color .25s,box-shadow .25s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(76,175,80,0.12);}
+.form-group textarea{resize:vertical;min-height:110px}
+.form-submit{width:100%;padding:15px;background:var(--green);color:var(--white);border:none;border-radius:50px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 6px 20px rgba(76,175,80,0.3);}
+.form-submit:hover{background:var(--green-dark);transform:translateY(-2px)}
+.form-success{display:none;text-align:center;padding:32px;color:var(--green-dark);font-weight:600;font-size:.95rem;}
+.form-success.show{display:block}
+
+/* FOOTER */
+footer{background:var(--charcoal);color:rgba(255,255,255,0.75);padding:56px 5% 0;}
+.footer-top{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.footer-brand .logo{font-size:1.8rem;font-weight:800;color:var(--green);margin-bottom:14px;display:block;}
+.footer-brand .logo span{color:white;}
+.footer-brand p{font-size:.85rem;color:rgba(255,255,255,0.5);line-height:1.7;max-width:240px;margin-bottom:16px;}
+.footer-socials{display:flex;gap:10px;}
+.footer-social-btn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;text-decoration:none;transition:transform .2s;}
+.footer-social-btn:hover{transform:scale(1.15)}
+.footer-col h4{font-size:.82rem;font-weight:700;color:rgba(255,255,255,0.9);letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul li a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:.85rem;transition:color .2s;}
+.footer-col ul li a:hover{color:var(--green-light)}
+.footer-col .contact-line{display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;font-size:.85rem;color:rgba(255,255,255,0.5);}
+.footer-col .contact-line a{color:rgba(255,255,255,0.5);text-decoration:none;transition:color .2s;}
+.footer-col .contact-line a:hover{color:var(--green-light)}
+.footer-bottom{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:20px 0;}
+.footer-copy{font-size:.8rem;color:rgba(255,255,255,0.3)}
+.footer-tagline{font-size:.8rem;color:var(--green-light);font-weight:700;letter-spacing:1px}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* MOBILE */
+@media(max-width:1000px){
+  .hero-inner{grid-template-columns:1fr;gap:40px}
+  .hero-visual{display:none}
+  .about-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
+  .about-img-wrap{display:none}
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px}
+  .hamburger{display:flex}
+  .nav-links{position:fixed;top:72px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--gray-light);flex-direction:column;align-items:center;gap:4px;padding:0 16px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s;}
+  .nav-links.open{max-height:400px;padding:20px 16px}
+  .form-row{grid-template-columns:1fr}
+  .audit-inner{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+}
+@media(max-width:600px){
+  section{padding:60px 5%}
+  .hero-ctas{flex-direction:column;align-items:flex-start}
+  .footer-top{grid-template-columns:1fr}
+  .hero-stats{gap:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo"><span>Map</span>Presence</div>
+  <div class="nav-links" id="navLinks">
+    <a href="#home" class="active">Home</a>
+    <a href="#services">Services</a>
+    <a href="#audit">Free Audit</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-brand">
+        <div class="logo">🗺️</div>
+        <div>
+          <div class="hero-brand-name"><span>Map</span>Presence</div>
+          <div class="hero-brand-sub">LOCAL · WEB · SOCIAL</div>
+        </div>
+      </div>
+      <div class="hero-badge">📍 Google Maps Experts</div>
+      <h1>Put Your Business <span>On The Map</span></h1>
+      <p class="hero-sub">We help local businesses dominate Google Maps — more visibility, more calls, more customers.</p>
+      <div class="hero-ctas">
+        <a href="#pricing" class="btn-primary">See Our Plans</a>
+        <a href="#audit" class="btn-outline">Get Free Audit</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">+80%</div><div class="stat-label">More Visibility</div></div>
+        <div class="stat"><div class="stat-num">3x</div><div class="stat-label">More Calls</div></div>
+        <div class="stat"><div class="stat-num">500+</div><div class="stat-label">Clients Served</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img-card">
+        <img src="1000644968.png" alt="MapPresence Hero" style="width:100%; height:420px; object-fit:cover;"/>
+        <div class="hero-img-overlay">
+          <div class="hero-img-badge">📍 Google Maps Optimised</div>
+          <div class="hero-img-text">Your clinic, top of search results.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-inner">
+    <div class="reveal">
+      <span class="section-tag">What We Do</span>
+      <h2>Services That <span>Drive Growth</span></h2>
+      <p class="section-sub">From Google Maps to your full online presence — everything local businesses need to grow.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">🗺️</div>
+        <h3>Google Maps Optimisation</h3>
+        <p>Complete setup and optimisation of your Google Business Profile — categories, descriptions, services, photos and more.</p>
+        <span class="service-tag">Core Service</span>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📈</div>
+        <h3>Local Ranking Growth</h3>
+        <p>Ongoing monthly strategies to push your business higher in local search results and outrank competitors.</p>
+        <span class="service-tag">Monthly Growth</span>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🌐</div>
+        <h3>Website Creation</h3>
+        <p>Professional websites built to rank on Google and convert visitors into patients or customers.</p>
+        <span class="service-tag">SEO-Ready</span>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📣</div>
+        <h3>Marketing &amp; Social Media</h3>
+        <p>Instagram, Facebook &amp; TikTok management — content, posting, growth and engagement every month.</p>
+        <span class="service-tag">Growth Package</span>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">⭐</div>
+        <h3>Reputation Management</h3>
+        <p>Strategies to grow 5-star reviews, respond professionally and build a trustworthy image online.</p>
+        <span class="service-tag">Trust Builder</span>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📊</div>
+        <h3>Performance Monitoring</h3>
+        <p>Monthly reports showing exactly how your profile is performing — views, clicks, calls and ranking.</p>
+        <span class="service-tag">Full Transparency</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FREE AUDIT -->
+<section id="audit">
+  <div class="audit-inner">
+    <div class="audit-text reveal">
+      <span class="section-tag">100% Free</span>
+      <h2>Get Your Free <span>Profile Audit</span></h2>
+      <p>We scan your Google Business Profile and send you a full video report showing every problem — your rating, missing info, visibility gaps — all for free, no strings attached.</p>
+      <div class="audit-features">
+        <div class="audit-feature">
+          <div class="audit-feature-icon">🔍</div>
+          <span>Full profile scan &amp; analysis</span>
+        </div>
+        <div class="audit-feature">
+          <div class="audit-feature-icon">⭐</div>
+          <span>Current rating &amp; review audit</span>
+        </div>
+        <div class="audit-feature">
+          <div class="audit-feature-icon">🎥</div>
+          <span>Video report of all issues found</span>
+        </div>
+        <div class="audit-feature">
+          <div class="audit-feature-icon">📍</div>
+          <span>Visibility &amp; competitor comparison</span>
+        </div>
+      </div>
+      <a href="#contact" class="btn-audit">Request My Free Audit →</a>
+      <div class="audit-free-badge">🎁 Completely FREE — No commitment</div>
+    </div>
+    <div class="audit-card reveal">
+      <div class="audit-card-title">SAMPLE AUDIT REPORT</div>
+      <div class="audit-item">
+        <div class="audit-dot red"></div>
+        <div class="audit-item-text">Business description missing</div>
+        <span class="audit-item-status status-bad">Critical</span>
+      </div>
+      <div class="audit-item">
+        <div class="audit-dot red"></div>
+        <div class="audit-item-text">Wrong business category selected</div>
+        <span class="audit-item-status status-bad">Critical</span>
+      </div>
+      <div class="audit-item">
+        <div class="audit-dot orange"></div>
+        <div class="audit-item-text">Only 3 photos uploaded</div>
+        <span class="audit-item-status status-warn">Improve</span>
+      </div>
+      <div class="audit-item">
+        <div class="audit-dot orange"></div>
+        <div class="audit-item-text">Services not listed</div>
+        <span class="audit-item-status status-warn">Improve</span>
+      </div>
+      <div class="audit-item">
+        <div class="audit-dot orange"></div>
+        <div class="audit-item-text">No response to reviews</div>
+        <span class="audit-item-status status-warn">Improve</span>
+      </div>
+      <div class="audit-item">
+        <div class="audit-dot green"></div>
+        <div class="audit-item-text">Phone number verified</div>
+        <span class="audit-item-status status-ok">Good</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="reveal">
+      <span class="section-tag">Transparent Pricing</span>
+      <h2>Choose Your <span>Growth Plan</span></h2>
+      <p class="section-sub">Clear options for every goal — from a one-time setup to full monthly growth.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <!-- Option 1: One-Time -->
+      <div class="pricing-card">
+        <div class="price-label">OPTION 1</div>
+        <div class="price-emoji">🗺️</div>
+        <div class="price-amount"><sup>£</sup>250</div>
+        <div class="price-period">one-time payment</div>
+        <p class="price-desc">Perfect for a professionally structured Google profile patients can easily find.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span><span>Category optimisation</span></li>
+          <li><span class="check">✓</span><span>Professional description rewrite</span></li>
+          <li><span class="check">✓</span><span>Services structuring</span></li>
+          <li><span class="check">✓</span><span>Full profile correction</span></li>
+          <li><span class="check">✓</span><span>Basic visibility boost</span></li>
+          <li><span class="check">✓</span><span>Lifetime structured setup</span></li>
+        </ul>
+        <a href="#contact" class="pricing-cta">Get Started</a>
+      </div>
+      <!-- Option 2: Monthly -->
+      <div class="pricing-card featured">
+        <div class="pricing-badge">⭐ Most Popular</div>
+        <div class="price-label">OPTION 2</div>
+        <div class="price-emoji">📈</div>
+        <div class="price-amount"><sup>£</sup>120<span class="price-period">/month</span></div>
+        <p class="price-desc">For businesses that want to grow, outrank competitors and continuously strengthen their local presence.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span><span>Everything in Option 1</span></li>
+          <li><span class="check">✓</span><span>Ongoing monthly optimisation</span></li>
+          <li><span class="check">✓</span><span>Competitor monitoring</span></li>
+          <li><span class="check">✓</span><span>Performance reports</span></li>
+          <li><span class="check">✓</span><span>Profile updates &amp; improvements</span></li>
+          <li><span class="check">✓</span><span>Priority support</span></li>
+        </ul>
+        <a href="#contact" class="pricing-cta">Start Growing</a>
+      </div>
+      <!-- Website -->
+      <div class="pricing-card">
+        <div class="price-label">WEBSITE</div>
+        <div class="price-emoji">🌐</div>
+        <div class="price-amount" style="font-size:1.5rem;padding-top:4px">Custom</div>
+        <div class="price-period">contact us for a quote</div>
+        <p class="price-desc">A professional website built to rank on Google and convert visitors into patients or customers.</p>
+        <ul class="price-features">
+          <li><span class="check">✓</span><span>Modern professional design</span></li>
+          <li><span class="check">✓</span><span>SEO optimised for Google</span></li>
+          <li><span class="check">✓</span><span>Mobile friendly</span></li>
+          <li><span class="check">✓</span><span>English language support</span></li>
+          <li><span class="check">✓</span><span>Contact form &amp; booking</span></li>
+        </ul>
+        <a href="#contact" class="pricing-cta">Contact Us for Price</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-img-wrap reveal">
+        <div class="about-img-box">
+          <img src="mappic.jpg" alt="Our team" style="width:100%; height:100%; object-fit:cover;"/>
+        </div>
+        <div class="about-float">
+          <div class="about-float-num">500+</div>
+          <div class="about-float-lbl">Happy Clients</div>
+        </div>
+      </div>
+      <div class="about-text reveal">
+        <span class="section-tag">Our Story</span>
+        <h2>We Help Local Businesses <span>Win Online</span></h2>
+        <p>MapPresence was built with one mission: make it simple for local businesses — starting with medical clinics — to be found, chosen, and trusted online.</p>
+        <p>We started with doctors because patients search Google before picking a clinic. A well-optimised profile is not optional — it's essential. We handle that, so you can focus on your patients.</p>
+        <div class="about-pillars">
+          <div class="pillar">
+            <div class="pillar-icon">🎯</div>
+            <div><h4>Results-Focused</h4><p>Every action we take is tied to measurable growth.</p></div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">🤝</div>
+            <div><h4>Long-Term Partnership</h4><p>We grow with your business, not just set it up and leave.</p></div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">🌍</div>
+            <div><h4>Built for the UK &amp; Beyond</h4><p>Professional service in English — serving clients across the UK and internationally.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <span class="section-tag">Get In Touch</span>
+        <h2>Ready to <span>Grow?</span></h2>
+        <p>Book a free audit of your Google profile. No commitment — just real insight on where you stand and what you can improve.</p>
+        <div class="contact-item">
+          <div class="contact-item-icon">📱</div>
+          <a href="https://wa.me/96181719919" target="_blank">WhatsApp Us</a>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">🌍</div>
+          <span>Serving the UK &amp; Internationally</span>
+        </div>
+      </div>
+      <div class="contact-form reveal">
+        <div id="formContent">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" id="fname" placeholder="John Smith..."/>
+            </div>
+            <div class="form-group">
+              <label>Phone / WhatsApp</label>
+              <input type="tel" id="fphone" placeholder="+44..."/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="femail" placeholder="you@example.com"/>
+          </div>
+          <div class="form-group">
+            <label>I'm Interested In</label>
+            <select id="fservice">
+              <option value="">Select a service...</option>
+              <option value="audit">Free Profile Audit</option>
+              <option value="onetime">One-Time Optimisation (£250)</option>
+              <option value="monthly">Monthly Optimisation (£120/mo)</option>
+              <option value="website">Website Creation</option>
+              <option value="full">Full Package</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message (optional)</label>
+            <textarea id="fmsg" placeholder="Tell us about your business..."></textarea>
+          </div>
+          <button class="form-submit" onclick="submitForm()">Send Message — We'll reply on WhatsApp</button>
+        </div>
+        <div class="form-success" id="formSuccess">
+          <div style="font-size:2.5rem;margin-bottom:12px">✅</div>
+          <div>Message sent! We'll contact you on WhatsApp shortly.</div>
+          <a href="https://wa.me/96181719919" target="_blank" style="display:inline-block;margin-top:16px;background:var(--green);color:white;text-decoration:none;padding:12px 28px;border-radius:50px;font-weight:700;font-size:.9rem;">Open WhatsApp Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo"><span>Map</span>Presence</div>
+      <p>We help local businesses dominate Google Maps and grow their online presence with professional services.</p>
+      <div class="footer-socials">
+        <a href="#" class="footer-social-btn" style="background:#E1306C;" title="Instagram">📸</a>
+        <a href="#" class="footer-social-btn" style="background:#1877F2;" title="Facebook">👍</a>
+        <a href="#" class="footer-social-btn" style="background:#000;" title="TikTok">🎵</a>
+        <a href="https://wa.me/96181719919" class="footer-social-btn" style="background:#25D366;" title="WhatsApp" target="_blank">💬</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Pages</h4>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#audit">Free Audit</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#services">Google Maps Optimisation</a></li>
+        <li><a href="#services">Local Ranking Growth</a></li>
+        <li><a href="#services">Website Creation</a></li>
+        <li><a href="#services">Social Media</a></li>
+        <li><a href="#services">Reputation Management</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <div class="contact-line">💬 <a href="https://wa.me/96181719919" target="_blank">WhatsApp Us</a></div>
+      <div class="contact-line">🌍 <span>UK &amp; International</span></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 MapPresence. All rights reserved.</div>
+    <div class="footer-tagline">LOCAL · WEB · SOCIAL</div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+function sanitizeInput(text) {
+  return text.replace(/[&<>"]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    if (m === '"') return '&quot;';
+    return m;
+  });
+}
+
+function submitForm() {
+  var name    = document.getElementById('fname').value.trim();
+  var phone   = document.getElementById('fphone').value.trim();
+  var email   = document.getElementById('femail').value.trim();
+  var service = document.getElementById('fservice');
+  var serviceText = service.options[service.selectedIndex].text;
+  var msg     = document.getElementById('fmsg').value.trim();
+
+  if (!name || !email) {
+    alert('Please fill in your name and email.');
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  var safeName    = sanitizeInput(name);
+  var safePhone   = sanitizeInput(phone);
+  var safeEmail   = sanitizeInput(email);
+  var safeService = sanitizeInput(serviceText);
+  var safeMsg     = sanitizeInput(msg);
+
+  var waMsg = 'Hello MapPresence\n\n━━━━━━━━━━━━━\n🧑 Name: ' + safeName + '\n'
+    + (safePhone ? '📞 Phone: ' + safePhone + '\n' : '')
+    + '📧 Email: ' + safeEmail + '\n'
+    + '🎯 Interested in: ' + safeService + '\n'
+    + (safeMsg ? '💬 Message: ' + safeMsg + '\n' : '')
+    + '━━━━━━━━━━━━━\nPlease get back to me. Thank you!';
+
+  var waURL = 'https://wa.me/96181719919?text=' + encodeURIComponent(waMsg);
+
+  document.getElementById('formContent').style.display = 'none';
+  document.getElementById('formSuccess').classList.add('show');
+  setTimeout(function(){ window.open(waURL, '_blank'); }, 400);
+}
+
+window.addEventListener('scroll', function() {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+  var sections = ['home','services','audit','pricing','about','contact'];
+  var current = 'home';
+  sections.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 120) current = id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(function(a) {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+document.querySelectorAll('.nav-links a').forEach(function(a) {
+  a.addEventListener('click', function() {
+    document.getElementById('navLinks').classList.remove('open');
+  });
+});
+
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+</script>
+</body>
+</html>
